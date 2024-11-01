@@ -1,5 +1,5 @@
 
-import { Delete, SunMoon } from "lucide-react"
+import { Delete, FilePenLine, SunMoon } from "lucide-react"
 import { useState } from "react"
 
 const TodoList = () => {
@@ -7,14 +7,25 @@ const TodoList = () => {
   const [tasks, setTasks] = useState([])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [isEdit, setIsEdit] = useState(null)
 
 
-  // Function to add a new task
+  // function to add new task and edit existing task using the if else
   const addTask = () => {
-    const newTask = { title, description, completed: false }
-    setTasks([...tasks, newTask])
-    setTitle('')
-    setDescription('')
+    if (isEdit !== null) {
+      // Update the existing task
+      const newTasks = tasks.map((task, index) =>
+        index === isEdit ? { ...task, title, description } : task
+      );
+      setTasks(newTasks);
+      setIsEdit(null); // Editing disabled
+    } else {
+      // Add a new task
+      const newTask = { title, description, completed: false };
+      setTasks([...tasks, newTask]);
+    }
+    setTitle("");
+    setDescription("");
   };
 
   // Function to mark the task as completed
@@ -30,6 +41,13 @@ const TodoList = () => {
   const deleteTask = (index) => {
     setTasks(tasks.filter((_, i) => i !== index))
   };
+
+  //function to edit a task
+  const editTask = (index) => {
+    setIsEdit(index);
+    setTitle(tasks[index].title);
+    setDescription(tasks[index].description);
+  }
 
   function handleClick() {
     setIsDarkMode(!isDarkMode)
@@ -52,7 +70,7 @@ const TodoList = () => {
         </div>
 
         <div className="flex items-center max-md:flex-wrap ml-2 pb-10">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
             <label htmlFor="tasks" className="text-2xl font-bold underline">Tasks:</label>
             <input type="text" onChange={handleTitleChange} value={title} placeholder="title..." className="border w-24 max-w-xs rounded-lg h-10 outline-none text-black px-2" />
             <input type="text" onChange={handleDescriptionChange} value={description} placeholder="description..." className="border w-40 max-w-xs rounded-lg h-10 outline-none text-black px-2" />
@@ -63,7 +81,7 @@ const TodoList = () => {
           </div>
         </div>
 
-        <div className="flex pb-8 px-9">
+        <div className="flex pb-8 px-4">
           <input type="search" name="search-bar" placeholder="search task..." className=" border w-[300px] max-w-xs rounded-lg h-10 outline-none text-black px-3" />
 
           <div className="ml-3">
@@ -84,7 +102,8 @@ const TodoList = () => {
                 <button onClick={() => markCompleted(index)} className="text-sm text-green-500 hover:text-green-600">
                   {task.completed ? "Undo" : "Complete"}
                 </button>
-                <Delete onClick={() => deleteTask(index)} className="text-sm text-red-500 hover:text-red-600" />
+                <FilePenLine onClick={() => editTask(index)} className="text-sm text-blue-500" />
+                <Delete onClick={() => deleteTask(index)} className="text-sm text-red-500 " />
               </div>
             </div>
           ))}
